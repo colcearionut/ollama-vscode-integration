@@ -3,33 +3,31 @@ import axios from 'axios';
 import { Ollama } from 'ollama-node';
 
 export async function generateWithOllama(prompt: string){
-    try {        
-        const modelName = 'deepseek-r1:32b';
-        const ollama = new Ollama();
-        await ollama.setModel(modelName);
-    
-        const uri = vscode.Uri.parse('untitled:' + Date.now().toString());
 
-        // Open a new empty document at the specified URI
-        let doc: vscode.TextDocument;
-        let editor: vscode.TextEditor;
+    const modelName = 'deepseek-r1:32b';
+    const ollama = new Ollama();
+    await ollama.setModel(modelName);
 
-        try {   
-            (async () => {
-                // Initialize the document
-                doc = await vscode.workspace.openTextDocument(uri);
-                editor = await vscode.window.showTextDocument(doc);
-            })();
-        } catch (error) {
-            console.error('Error showing response:', error);
-        }
+    const uri = vscode.Uri.parse('untitled:' + Date.now().toString());
 
-        // callback to print each word 
-        const print = async (word: string) =>             
-        {
-            await writeWord(word, uri, doc, editor);
-        }
+    // Open a new empty document at the specified URI
+    let doc: vscode.TextDocument;
+    let editor: vscode.TextEditor;
 
+    try {   
+        doc = await vscode.workspace.openTextDocument(uri);
+        editor = await vscode.window.showTextDocument(doc);
+    } catch (error) {
+        console.error('Error opening text document:', error);
+    }
+
+    // callback to print each word 
+    const print = async (word: string) =>             
+    {
+        await writeWord(word, uri, doc, editor);
+    }
+
+    try {
         await ollama.streamingGenerate(prompt, print);
     } catch (error) {
         throw new Error(`Ollama API error: ` + error);
