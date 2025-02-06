@@ -2,8 +2,14 @@ import * as vscode from 'vscode';
 import { Ollama } from 'ollama-node';
 
 let existingPanel: vscode.WebviewPanel | undefined;
+let isGenerating: boolean;
 
 export async function generateWithOllama(prompt: string) {
+    if (isGenerating) {
+        vscode.window.showWarningMessage('Please wait for current generation to finish');
+        return;
+    }
+
     const modelName = 'deepseek-r1:32b';
     const ollama = new Ollama();
     await ollama.setModel(modelName);
@@ -11,20 +17,23 @@ export async function generateWithOllama(prompt: string) {
     // Reuse or create a new webview panel for output
     var panel = getPanel();
 
-    // Function to send words to the webview for display
-    const print = async (word: string) => {
-            panel?.webview.postMessage(word);
-    };
-
     try {
-        await ollama.streamingGenerate(prompt, print);
+        isGenerating = true;
+        await ollama.streamingGenerate(prompt, (word) => panel.webview.postMessage(word), null, checkCompletion);
     } catch (error) {
+        isGenerating = false;
         throw new Error(`Ollama API error: ${error}`);
     }
 }
 
+function checkCompletion(status: string) {
+    if (status.includes("\"done\":true")) {
+        isGenerating = false;
+    }
+}
+
 function getPanel(): vscode.WebviewPanel {
-    if (existingPanel) {        
+    if (existingPanel) {
         existingPanel?.webview.postMessage("\n\n\nNEW PROMPT:\n\n\n");
         return existingPanel;
     }
@@ -33,7 +42,7 @@ function getPanel(): vscode.WebviewPanel {
         'ollamaOutput',
         'JARVIS AI',
         vscode.ViewColumn.Two,
-        { enableScripts: true, retainContextWhenHidden:true }
+        { enableScripts: true, retainContextWhenHidden: true }
     );
 
     // Set up the HTML content
@@ -79,5 +88,6 @@ function getPanel(): vscode.WebviewPanel {
     `;
 
     existingPanel = panel;
+    panel.onDidDispose(() => existingPanel = undefined);
     return panel;
 }

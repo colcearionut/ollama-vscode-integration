@@ -20,12 +20,11 @@ export function activate(context: vscode.ExtensionContext) {
 
         try
         {
-            vscode.window.showWarningMessage('Prompt sent to Ollama');
             await generateWithOllama(prompt);
         }
         catch (err)
         {
-            vscode.window.showErrorMessage('Error Generating with Ollama:    ' + err);
+            vscode.window.showErrorMessage('Error Generating with Ollama: ' + err);
             return;
         }
     });
