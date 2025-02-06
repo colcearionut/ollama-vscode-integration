@@ -1,18 +1,19 @@
 import * as vscode from 'vscode';
 import { Ollama } from 'ollama-node';
 
+let ollama: Ollama | undefined;
 let existingPanel: vscode.WebviewPanel | undefined;
 let isGenerating: boolean;
 
 export async function generateWithOllama(prompt: string) {
+    if (!ollama){
+        ollama = await initializeModel("deepseek-r1:32b");
+    }
+
     if (isGenerating) {
         vscode.window.showWarningMessage('Please wait for current generation to finish');
         return;
     }
-
-    const modelName = 'deepseek-r1:32b';
-    const ollama = new Ollama();
-    await ollama.setModel(modelName);
 
     // Reuse or create a new webview panel for output
     var panel = getPanel();
@@ -24,6 +25,12 @@ export async function generateWithOllama(prompt: string) {
         isGenerating = false;
         throw new Error(`Ollama API error: ${error}`);
     }
+}
+
+async function initializeModel(modelName: string){
+    var ollamaInstance = new Ollama();
+    await ollamaInstance.setModel(modelName);
+    return ollamaInstance;
 }
 
 function checkCompletion(status: string) {

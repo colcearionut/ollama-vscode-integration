@@ -38,13 +38,7 @@
     "commands": [
       {
         "command": "ollama.generate",
-        "title": "Generate with Ollama",
-        "keybindings": [
-          {
-            "key": "alt+shift+z",
-            "when": "editorTextFocus"
-          }
-        ]
+        "title": "Generate with Ollama"
       }
     ],
     "keybindings": [
