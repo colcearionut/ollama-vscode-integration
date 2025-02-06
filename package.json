@@ -1,7 +1,7 @@
 {
   "name": "ollama-vscode-integration",
   "displayName": "ollama-vscode-integration",
-  "description": "Extension for VSCode to autocomplete from Ollama models like Deepseek",
+  "description": "Extension for VSCode to autocomplete from Ollama models like DeepseekR1",
   "version": "0.0.1",
   "main": "./out/extension.js",
   "engines": {
@@ -41,11 +41,17 @@
         "title": "Generate with Ollama",
         "keybindings": [
           {
-            "key": "ctrl+shift+g",
-            "mac": "cmd+g",
+            "key": "alt+shift+z",
             "when": "editorTextFocus"
           }
         ]
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "ollama.generate",
+        "key": "alt+shift+z",
+        "when": "editorTextFocus"
       }
     ],
     "menus": {
@@ -58,7 +64,6 @@
     }
   },
   "dependencies": {
-    "axios": "^1.7.9",
     "ollama": "^0.5.12",
     "ollama-node": "^0.1.28"
   }

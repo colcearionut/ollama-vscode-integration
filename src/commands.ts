@@ -36,7 +36,7 @@ function getPanel(): vscode.WebviewPanel {
         { enableScripts: true, retainContextWhenHidden:true }
     );
 
-    // Set up the HTML content only once
+    // Set up the HTML content
     panel.webview.html = `
         <!DOCTYPE html>
         <html>
@@ -47,10 +47,10 @@ function getPanel(): vscode.WebviewPanel {
             <style>
                 body {
                     margin: 0;
-                    padding: 10px;
-                    font-family: 'Courier New', monospace;
-                    font-size: 14px;
-                    min-height: 100vh;
+                    padding: 8px;
+                    font-family: Consolas;
+                    font-size: 15px;
+                    min-height: 200vh;
                     display: flex;
                     flex-direction: column;
                 }
