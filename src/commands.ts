@@ -1,55 +1,83 @@
 import * as vscode from 'vscode';
-import axios from 'axios';
 import { Ollama } from 'ollama-node';
 
-export async function generateWithOllama(prompt: string){
+let existingPanel: vscode.WebviewPanel | undefined;
 
+export async function generateWithOllama(prompt: string) {
     const modelName = 'deepseek-r1:32b';
     const ollama = new Ollama();
     await ollama.setModel(modelName);
 
-    const uri = vscode.Uri.parse('untitled:' + Date.now().toString());
+    // Reuse or create a new webview panel for output
+    var panel = getPanel();
 
-    // Open a new empty document at the specified URI
-    let doc: vscode.TextDocument;
-    let editor: vscode.TextEditor;
-
-    try {   
-        doc = await vscode.workspace.openTextDocument(uri);
-        editor = await vscode.window.showTextDocument(doc);
-    } catch (error) {
-        console.error('Error opening text document:', error);
-    }
-
-    // callback to print each word 
-    const print = async (word: string) =>             
-    {
-        await writeWord(word, uri, doc, editor);
-    }
+    // Function to send words to the webview for display
+    const print = async (word: string) => {
+            panel?.webview.postMessage(word);
+    };
 
     try {
         await ollama.streamingGenerate(prompt, print);
     } catch (error) {
-        throw new Error(`Ollama API error: ` + error);
+        throw new Error(`Ollama API error: ${error}`);
     }
 }
 
-export async function writeWord(word: string, uri: vscode.Uri, doc: vscode.TextDocument, editor: vscode.TextEditor){
-    if (word.length === 0) return;
-
-    // Ensure we are at the end of the document
-    const currentEndPosition = new vscode.Position(doc.lineCount - 1, doc.lineAt(doc.lineCount - 1).text.length);
-
-    // Create a text edit to append the chunk
-    const range = new vscode.Range(currentEndPosition, currentEndPosition);
-    const edit = new vscode.WorkspaceEdit();
-    edit.insert(uri, currentEndPosition, word);
-
-    // Apply the edit
-    await vscode.workspace.applyEdit(edit);
-
-    // Ensure the editor scrolls to show the new content
-    if (editor) {
-        editor.revealRange(range, vscode.TextEditorRevealType.Default);
+function getPanel(): vscode.WebviewPanel {
+    if (existingPanel) {        
+        existingPanel?.webview.postMessage("\n\n\nNEW PROMPT:\n\n\n");
+        return existingPanel;
     }
+
+    var panel = vscode.window.createWebviewPanel(
+        'ollamaOutput',
+        'JARVIS AI',
+        vscode.ViewColumn.Two,
+        { enableScripts: true, retainContextWhenHidden:true }
+    );
+
+    // Set up the HTML content only once
+    panel.webview.html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>JARVIS AI</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+                body {
+                    margin: 0;
+                    padding: 10px;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                    min-height: 100vh;
+                    display: flex;
+                    flex-direction: column;
+                }
+                #output {
+                    width: 100%;
+                    height: calc(100vh - 20px);
+                    overflow-y: auto;
+                    white-space: pre-wrap;
+                    word-wrap: break-word;
+                    padding: 5px;
+                    margin: 0;
+                }
+            </style>
+        </head>
+        <body>
+            <pre id="output"></pre>
+            <script>
+                window.addEventListener('message', function(event) {
+                    const output = document.getElementById('output');
+                    output.textContent += event.data;
+                    output.scrollTop = output.scrollHeight;
+                });
+            </script>
+        </body>
+        </html>
+    `;
+
+    existingPanel = panel;
+    return panel;
 }
