@@ -1,7 +1,7 @@
 {
   "name": "ollama-vscode-integration",
   "displayName": "ollama-vscode-integration",
-  "description": "Extension for VSCode to autocomplete from Ollama models like DeepseekR1",
+  "description": "Extension for VSCode to prompt local Ollama models like DeepseekR1",
   "version": "0.0.1",
   "main": "./out/extension.js",
   "engines": {
@@ -14,20 +14,11 @@
     "start": "code --extensionDevelopmentPath=./src",
     "vscode:prepublish": "npm run compile",
     "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "watch": "tsc -watch -p ./"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.10",
     "@types/node": "^20.17.17",
     "@types/vscode": "^1.60.0",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "@typescript-eslint/parser": "^8.22.0",
-    "@vscode/test-cli": "^0.0.10",
-    "@vscode/test-electron": "^2.4.1",
-    "eslint": "^9.19.0",
     "typescript": "^4.5.2",
     "vsce": "^1.23.0"
   },
@@ -37,13 +28,13 @@
   "contributes": {
     "commands": [
       {
-        "command": "ollama.generate",
-        "title": "Generate with Ollama"
+        "command": "ollama.prompt",
+        "title": "Prompt a local Ollama instance."
       }
     ],
     "keybindings": [
       {
-        "command": "ollama.generate",
+        "command": "ollama.prompt",
         "key": "alt+shift+z",
         "when": "editorTextFocus"
       }
@@ -51,14 +42,13 @@
     "menus": {
       "editor/context": [
         {
-          "command": "ollama.generate",
+          "command": "ollama.prompt",
           "group": "navigation"
         }
       ]
     }
   },
   "dependencies": {
-    "ollama": "^0.5.12",
     "ollama-node": "^0.1.28"
   }
 }
