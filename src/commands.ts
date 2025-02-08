@@ -19,6 +19,7 @@ export async function generateWithOllama(prompt: string) {
     var panel = getPanel();
 
     try {
+        panel?.webview.postMessage("INPUT:\n\n" + prompt + "\n\n");
         isGenerating = true;
         await ollama.streamingGenerate(prompt, (word) => panel.webview.postMessage(word), null, checkCompletion);
     } catch (error) {
@@ -41,7 +42,7 @@ function checkCompletion(status: string) {
 
 function getPanel(): vscode.WebviewPanel {
     if (existingPanel) {
-        existingPanel?.webview.postMessage("\n\n\nNEW PROMPT:\n\n\n");
+        existingPanel?.webview.postMessage("\n\n\nNEW PROMPT:\n");
         return existingPanel;
     }
 
@@ -58,7 +59,7 @@ function getPanel(): vscode.WebviewPanel {
         <html>
         <head>
             <meta charset="UTF-8">
-            <title>JARVIS AI</title>
+            <title>AI Assistant</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <style>
                 body {
@@ -66,18 +67,21 @@ function getPanel(): vscode.WebviewPanel {
                     padding: 8px;
                     font-family: Consolas;
                     font-size: 15px;
-                    min-height: 200vh;
+                    height: 100vh;
+                    overflow-y: auto;
                     display: flex;
                     flex-direction: column;
+                    box-sizing: border-box;
                 }
                 #output {
                     width: 100%;
-                    height: calc(100vh - 20px);
-                    overflow-y: auto;
+                    height: 100%;
+                    overflow-y: hidden; /* Remove internal scrolling */
                     white-space: pre-wrap;
                     word-wrap: break-word;
                     padding: 5px;
                     margin: 0;
+                    box-sizing: border-box;
                 }
             </style>
         </head>
@@ -87,7 +91,7 @@ function getPanel(): vscode.WebviewPanel {
                 window.addEventListener('message', function(event) {
                     const output = document.getElementById('output');
                     output.textContent += event.data;
-                    output.scrollTop = output.scrollHeight;
+                    output.scrollTop = output.scrollHeight - output.clientHeight; // Keep scroll in view
                 });
             </script>
         </body>
