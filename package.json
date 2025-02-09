@@ -27,12 +27,12 @@
   },
   "contributes": {
     "configuration": {
-         "title": "Ollama Settings",
+         "title": "Ollama Extension Settings",
          "type": "object",
          "properties": {
            "ollama.modelName": {
              "type": "string",
-             "description": "Default model name to use with the Ollama client.",
+             "description": "Default model name to use with the local Ollama instance.",
              "default": "deepseek-r1:1.5b"
            }
          }
