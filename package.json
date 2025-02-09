@@ -32,7 +32,7 @@
          "properties": {
            "ollama.modelName": {
              "type": "string",
-             "description": "Default model name to use with the local Ollama instance.",
+             "description": "The model name to use with the local Ollama instance.",
              "default": "deepseek-r1:1.5b"
            }
          }

@@ -30,15 +30,15 @@ export function createWebview(): vscode.WebviewPanel {
                     font-family: Consolas;
                     font-size: 15px;
                     height: 100vh;
-                    overflow-y: auto;
+                    overflow-y: hidden;
                     display: flex;
                     flex-direction: column;
                     box-sizing: border-box;
                 }
                 #output {
                     width: 100%;
-                    height: 100%;
-                    overflow-y: visible;
+                    flex-grow: 1;
+                    overflow-y: auto;
                     white-space: pre-wrap;
                     word-wrap: break-word;
                     padding: 5px;
@@ -53,7 +53,10 @@ export function createWebview(): vscode.WebviewPanel {
                 window.addEventListener('message', function(event) {
                     const output = document.getElementById('output');
                     output.textContent += event.data;
-                    output.scrollTop = output.scrollHeight - output.clientHeight;
+                    
+                    requestAnimationFrame(() => {
+                        output.scrollTop = output.scrollHeight - output.clientHeight + 10;
+                    });
                 });
             </script>
         </body>
