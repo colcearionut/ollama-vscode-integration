@@ -5,7 +5,7 @@ An extension to integrate with the Ollama client, to prompt local language model
 ## Requirements
 
 1. Install Ollama - https://ollama.com/
-2. In your terminal, pull the model you want to use: "ollama pull <modelName>" - https://ollama.com/library/
+2. In your terminal, pull the model you want to use: "ollama pull *modelName*" - https://ollama.com/library/
 3. In VSCode settings, under Ollama Extension Settings, set the model you want to use with the extension.
     - The default model is deepseek-r1:1.5b, as it's the most accessible to run.
 ![Settings](images/settings.png)
