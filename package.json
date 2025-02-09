@@ -30,6 +30,11 @@
          "title": "Ollama Extension Settings",
          "type": "object",
          "properties": {
+          "ollama.enable": {
+            "type": "boolean",
+            "description": "Enable the Ollama VSCode extension.",
+            "default": true
+          },
            "ollama.modelName": {
              "type": "string",
              "description": "The model name to use with the local Ollama instance.",

@@ -2,6 +2,11 @@ import * as vscode from 'vscode';
 import { generateWithOllama } from './generation';
 
 export async function ollamaPromptCommand(){
+    var isEnabled = vscode.workspace.getConfiguration('ollama').get<boolean>('enable', false);
+    if (!isEnabled){
+        return;
+    }
+
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
         return;
