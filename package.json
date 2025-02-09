@@ -1,7 +1,7 @@
 {
   "name": "ollama-vscode-integration",
   "displayName": "ollama-vscode-integration",
-  "description": "Extension for VSCode to prompt local Ollama models like DeepseekR1",
+  "description": "Extension for VSCode to prompt local Ollama models.",
   "version": "0.0.1",
   "main": "./out/extension.js",
   "engines": {
@@ -26,6 +26,17 @@
     "tsconfig": "./tsconfig.json"
   },
   "contributes": {
+    "configuration": {
+         "title": "Ollama Settings",
+         "type": "object",
+         "properties": {
+           "ollama.modelName": {
+             "type": "string",
+             "description": "Default model name to use with the Ollama client.",
+             "default": "deepseek-r1:1.5b"
+           }
+         }
+      },
     "commands": [
       {
         "command": "ollama.prompt",
