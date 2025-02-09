@@ -6,10 +6,8 @@ import { print } from './presentation';
 let ollama: Ollama | undefined;
 let isGenerating: boolean;
 
-export async function generateWithOllama(prompt: string) {
-    if (!ollama){
-        ollama = await initializeModel();
-    }
+export async function generateWithOllama(prompt: string) {    
+    await initializeModel();
 
     if (isGenerating) {
         vscode.window.showWarningMessage('Please wait for current generation to complete.');
@@ -22,7 +20,7 @@ export async function generateWithOllama(prompt: string) {
         print("INPUT:\n\n" + prompt);
         print("\n\nOUTPUT:\n\n");
         isGenerating = true;
-        await ollama.streamingGenerate(prompt, (word) => print(word), null, checkCompletion);
+        await ollama?.streamingGenerate(prompt, (word) => print(word), null, checkCompletion);
     } catch (error) {
         isGenerating = false;
         throw new Error(`Ollama API error: ${error}`);
@@ -30,10 +28,11 @@ export async function generateWithOllama(prompt: string) {
 }
 
 async function initializeModel(){
+    if (!ollama){
+        ollama = new Ollama();
+    }
     var modelName = vscode.workspace.getConfiguration('ollama').get<string>('modelName', '');
-    var ollamaInstance = new Ollama();
-    await ollamaInstance.setModel(modelName);
-    return ollamaInstance;
+    await ollama.setModel(modelName);
 }
 
 function checkCompletion(status: string) {
